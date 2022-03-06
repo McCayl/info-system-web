@@ -1,24 +1,17 @@
 package com.mccayl.infosystemweb.model;
 
 import javax.persistence.*;
-import java.util.List;
 
 @Entity
-@Table
+@Table(name = "t_track")
 public class Track {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String name;
     private String author;
     private String genre;
     private Integer length;
-    @ManyToMany(cascade = CascadeType.ALL)
-    @JoinTable(name = "track_albums",
-            joinColumns = @JoinColumn(name = "track_id"),
-            inverseJoinColumns = @JoinColumn(name = "album_id")
-    )
-    private List <Album> albums;
 
     public Track() {}
 
@@ -69,11 +62,4 @@ public class Track {
         this.length = length;
     }
 
-    public List<Album> getAlbums() {
-        return albums;
-    }
-
-    public void setAlbums(List<Album> albums) {
-        this.albums = albums;
-    }
 }

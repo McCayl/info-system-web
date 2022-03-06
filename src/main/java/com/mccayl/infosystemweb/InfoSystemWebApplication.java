@@ -9,5 +9,4 @@ public class InfoSystemWebApplication {
 	public static void main(String[] args) {
 		SpringApplication.run(InfoSystemWebApplication.class, args);
 	}
-
 }

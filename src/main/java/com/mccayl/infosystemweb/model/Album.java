@@ -4,14 +4,14 @@ import javax.persistence.*;
 import java.util.List;
 
 @Entity
-@Table
+@Table(name = "t_album")
 public class Album {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String name;
     private Integer year;
-    @ManyToMany(mappedBy = "albums")
+    @ManyToMany(targetEntity = Track.class, cascade = { CascadeType.PERSIST, CascadeType.MERGE })
     private List <Track> trackList;
 
     public Album() {}
