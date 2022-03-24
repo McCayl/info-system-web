@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <style>
+        table {
+            font-family: arial, sans-serif;
+            border-collapse: collapse;
+            width: 100%;
+        }
+
+        td, th {
+            border: 1px solid #606060;
+            text-align: left;
+            padding: 8px;
+        }
+
+        h2 {
+            text-align: center;
+        }
+        p {
+            text-align: center;
+        }
+        .mainTh {
+            text-align: center;
+        }
+    </style>
+    <title>Track menu</title>
+</head>
+<body>
+
+<h2>Track menu</h2>
+<p><a href="./">Back to main page</a></p>
+<div style="text-align: right">
+    <button type="button" onclick="getAlbumTracks()">Refresh</button>
+</div>
+<table id="album_tracks_list"></table>
+<div style="height: 40px"></div>
+<div id="upd" style="height: 40px"></div>
+
+<script>
+    const url = './api/v1/albums/';
+
+    function deleteTrack(albumId, trackId) {
+        fetch(url + albumId + '/tracks/' + trackId, {
+            method: 'DELETE',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: {}
+        })
+            .then(response => {
+                if (response.ok) {
+                    getAlbumTracks();
+                } else alert("error");
+            });
+
+    }
+
+    function viewAlbumTracks(albums) {
+        let html =
+            '\n\t<tr>\n' +
+            '\t\t<th colspan="2" class="mainTh">Albums</th>\n' +
+            '\t\t<th colspan="2" class="mainTh">Tracks</th>\n' +
+            '\t\t<th rowspan="2" class="mainTh">Action</th>\n' +
+            '\t</tr>\n' +
+            '\t<tr>\n' +
+            '\t\t<th>Album id</th>\n' +
+            '\t\t<th>Album name</th>\n' +
+            '\t\t<th>Track id</th>\n' +
+            '\t\t<th>Track name</th>\n' +
+            '\t</tr>\n';
+        if(albums.length===0){
+            document.getElementById("album_tracks_list").innerHTML = html;
+            return;
+        }
+        for (let i = 0; i < albums.length; i++) {
+            let album = albums[i];
+            let trackList = album.trackList;
+            let length = trackList.length + 1;
+            if(trackList.length === 0) length++;
+            html = html +
+                '\t<tr>\n' +
+                '\t\t<td rowspan="'+ (length) +'">' + album.id + '</td>\n' +
+                '\t\t<td rowspan="'+ (length) +'">' + album.name + '</td>\n' +
+                '\t</tr>\n';
+            if(trackList.length === 0){
+                html = html +
+                    '\t<tr>\n' +
+                    '\t\t<td colspan="2" style="text-align: center">' + "None" + '</td>\n' +
+                    '\t\t<td>' + " " + '</td>\n' +
+                    '\t</tr>\n';
+            }
+            for(let j = 0; j < trackList.length; j++){
+                let track = trackList[j];
+                html = html +
+                    '\t<tr>\n' +
+                    '\t\t<td>' + track.id + '</td>\n' +
+                    '\t\t<td>' + track.name + '</td>\n' +
+                    '\t\t<td>\n' +
+                    '\t\t\t<button onclick="deleteTrack(' + album.id + ',' + track.id + ')">Delete</button>\n' +
+                    '\t\t</td>\n' +
+                    '\t</tr>\n';
+            }
+            html = html +
+                '\t<tr style="background-color: #a699b0">\n' +
+                '\t\t<td colspan="3">Input track id for add to this album</td>\n' +
+                '\t\t<td>\n' +
+                '\t\t\t<form id="al' + album.id + '" onsubmit="addTrackToAlbum(' + album.id + ')"></form>\n' +
+                '\t\t\t<input id="al' + album.id + '_input_id" required placeholder="Track id for add" onkeyup="this.value = this.value.replace (/\\D/gi, \'\').replace (/^0+/, \'\')" form="al' + album.id + '">\n' +
+                '\t\t</td>\n' +
+                '\t\t<td>\n' +
+                '\t\t\t<button type="submit" form="al' + album.id + '">Add</button>' +
+                '\t\t</td>\n' +
+                '\t</tr>\n';
+        }
+        document.getElementById("album_tracks_list").innerHTML = html;
+    }
+
+    function addTrackToAlbum(albumId){
+        fetch(url + albumId + '/tracks/' + document.getElementById("al"+albumId+"_input_id").value,{
+            method: "Post"
+        })
+            .then(response => {
+                if (response.ok) {
+                    getAlbumTracks();
+                } else alert("error");
+            });
+    }
+
+    function getAlbumTracks() {
+        fetch(url)
+            .then(response => {
+                if (response.ok) {
+                    response.json().then(function (data) {
+                        viewAlbumTracks(data);
+                    })
+                } else alert("error");
+            });
+    }
+    getAlbumTracks();
+</script>
+</body>
+</html>

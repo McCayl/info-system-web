@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <style>
+        table {
+            font-family: arial, sans-serif;
+            border-collapse: collapse;
+            width: 100%;
+        }
+
+        td, th {
+            border: 1px solid #606060;
+            text-align: left;
+            padding: 8px;
+        }
+
+        h2 {
+            text-align: center;
+        }
+
+        p {
+            text-align: center;
+        }
+    </style>
+    <title>album menu</title>
+</head>
+<body>
+<h2>Album menu</h2>
+<p><a href="./">Back to main page</a></p>
+<div style="text-align: right">
+    <button type="button" onclick="getAlbums()">Refresh</button>
+</div>
+<form id="input_create_album" onsubmit="createAlbum()"></form>
+<table id="album_list"></table>
+<div style="height: 40px"></div>
+<div id="upd" style="height: 40px"></div>
+
+<script>
+    const url = './api/v1/albums/';
+
+    function goToUpdateAlbum() {
+        viewForUpdateAlbum(document.getElementById('upd_album_id').value);
+    }
+
+    function viewForUpdateAlbum(albumId) {
+        let rows = document.getElementById("album_list").getElementsByTagName("tr");
+        let row = null;
+        for (let i = 1; i < rows.length - 1; i++) {
+            if (rows[i].getElementsByTagName("td")[0].innerText === albumId) {
+                row = rows[i];
+            }
+        }
+        if (row == null) {
+            alert("Incorrect id");
+            return;
+        }
+        document.getElementById("upd").innerHTML =
+            '\t<form id="input_update_album" onsubmit="updateAlbum(' + albumId + ')"></form>\n' +
+            '\t<table style="border: 0">\n' +
+            '\t\t<tr>\n' +
+            '\t\t\t<th>album name</th>\n' +
+            '\t\t\t<th>album year</th>\n' +
+            '\t\t\t<th>Action</th>\n' +
+            '\t\t</tr>\n' +
+            '\t\t<tr>' +
+            '\t\t\t<td><input required id="upd_album_name" value="' + row.getElementsByTagName("td")[1].innerText + '" form="input_update_album"></td>\n' +
+            '\t\t\t<td><input required id="upd_album_year" onkeyup="this.value = this.value.replace (/\\D/gi, \'\').replace (/^0+/, \'\')" value=" ' + row.getElementsByTagName("td")[2].innerText + '" form="input_update_album"></td>\n' +
+            '\t\t\t<td>\n' +
+            '\t\t\t\t<button type="submit" form="input_update_album">Apply</button>\n' +
+            '\t\t\t\t<button onClick="viewForInputAlbumId(">Cancel</button>\n' +
+            '\t\t\t</td>\n' +
+            '\t\t</tr>\n' +
+            '\t</table>\n';
+    }
+
+    function viewForInputAlbumId() {
+        document.getElementById("upd").innerHTML =
+            '\n\t<form id="start_upd" onsubmit="goToUpdateAlbum()">\n' +
+            '\t\t<input required onKeyUp="this.value = this.value.replace (/\\D/gi, \'\').replace (/^0+/, \'\')" id="upd_album_id" placeholder="album id" style="margin-right: 20px" form="start_upd">\n' +
+            '\t\t<button type="submit">Go to update</button>\n' +
+            '\t</form>\n'
+    }
+
+    function updateAlbum(albumId) {
+        fetch(url + albumId, {
+            method: 'Put',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                name: document.getElementById("upd_album_name").value,
+                year: document.getElementById("upd_album_year").value
+            })
+        })
+            .then(response => {
+                if (response.ok) {
+                    getAlbums();
+                } else alert("error");
+            });
+        viewForInputAlbumId();
+    }
+
+    function deleteAlbum(albumId) {
+        fetch(url + albumId, {
+            method: 'Delete'
+        })
+            .then(response => {
+                if (response.ok) {
+                    getAlbums();
+                } else alert("error");
+            });
+
+    }
+
+    function createAlbum() {
+        fetch(url, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                name: document.getElementById("album_name").value,
+                year: document.getElementById("album_year").value
+            })
+        })
+            .then(response => {
+                if (response.ok) {
+                    getAlbums();
+                } else alert("error");
+            });
+    }
+
+    function viewAlbums(albums) {
+        let html =
+            '\n\t<tr>\n' +
+            '\t\t<th>album id</th>\n' +
+            '\t\t<th>album name</th>\n' +
+            '\t\t<th>album year</th>\n' +
+            '\t\t<th>Action</th>\n' +
+            '\t</tr>\n';
+        for (let i = 0; i < albums.length; i++) {
+            let album = albums[i];
+            html = html +
+                '\t<tr>\n' +
+                '\t\t<td>' + album.id + '</td>\n' +
+                '\t\t<td>' + album.name + '</td>\n' +
+                '\t\t<td>' + album.year + '</td>\n' +
+                '\t\t<td><button onclick="deleteAlbum(' + album.id + ')">Delete</button></td>\n' +
+                '\t</tr>\n';
+        }
+        html = html +
+            '\t<tr>\n' +
+            '\t\t<td> </td>\n' +
+            '\t\t<td><input required id="album_name" placeholder="Name" form="input_create_album"></td>\n' +
+            '\t\t<td><input required onkeyup="this.value = this.value.replace (/\\D/gi, \'\').replace (/^0+/, \'\')" id="album_year" placeholder="Year" form="input_create_album"></td>\n' +
+            '\t\t<td><button type="submit" form="input_create_album">Create</button></td>\n' +
+            '\t</tr>';
+        document.getElementById("album_list").innerHTML = html;
+    }
+
+    function getAlbums() {
+        fetch(url)
+            .then(response => {
+                if (response.ok) {
+                    response.json().then(function (data) {
+                        viewAlbums(data);
+                    })
+                } else alert("error");
+            });
+    }
+
+    getAlbums();
+    viewForInputAlbumId();
+</script>
+</body>
+</html>

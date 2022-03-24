@@ -8,7 +8,7 @@ public class TrackViewController {
 
     @RequestMapping("tracks")
     public String getTracksPage() {
-        return "something/index.html"; //add path to your html page
+        return "Tracks.html"; //add path to your html page
     }
 
 }

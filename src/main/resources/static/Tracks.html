@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <style>
+        table {
+            font-family: arial, sans-serif;
+            border-collapse: collapse;
+            width: 100%;
+        }
+
+        td, th {
+            border: 1px solid #606060;
+            text-align: left;
+            padding: 8px;
+        }
+
+        h2 {
+            text-align: center;
+        }
+        p {
+            text-align: center;
+        }
+    </style>
+    <title>Track menu</title>
+</head>
+<body>
+
+<h2>Track menu</h2>
+<p><a href="./">Back to main page</a></p>
+<div style="text-align: right">
+    <button type="button" onclick="getTracks()">Refresh</button>
+</div>
+<form id="input_create_track" onsubmit="createTrack()"></form>
+<table id="track_list"></table>
+<div style="height: 40px"></div>
+<div id="upd" style="height: 40px"></div>
+
+<script>
+    const url = './api/v1/tracks/';
+    function goToUpdateTrack() {
+        viewForUpdateTrack(document.getElementById('upd_track_id').value);
+    }
+
+    function viewForUpdateTrack(trackId) {
+        let rows = document.getElementById("track_list").getElementsByTagName("tr");
+        let row = null;
+        for (let i = 1; i < rows.length - 1; i++) {
+            if (rows[i].getElementsByTagName("td")[0].innerText === trackId) {
+                row = rows[i];
+            }
+        }
+        if(row == null){
+            alert("Incorrect id");
+            return;
+        }
+        document.getElementById("upd").innerHTML =
+            '\t<form id="input_update_track" onsubmit="updateTrack(' + trackId + ')"></form>\n' +
+            '\t<table style="border: 0">\n' +
+            '\t\t<tr>\n' +
+            '\t\t\t<th>Track name</th>\n' +
+            '\t\t\t<th>Track author</th>\n' +
+            '\t\t\t<th>Track genre</th>\n' +
+            '\t\t\t<th>Track length</th>\n' +
+            '\t\t\t<th>Action</th>\n' +
+            '\t\t</tr>\n' +
+            '\t\t<tr>' +
+            '\t\t\t<td><input id="upd_track_name" required value="' + row.getElementsByTagName("td")[1].innerText + '" form="input_update_track"></td>\n' +
+            '\t\t\t<td><input id="upd_track_author" required value="' + row.getElementsByTagName("td")[2].innerText + '" form="input_update_track"></td>\n' +
+            '\t\t\t<td><input id="upd_track_genre" required value="' + row.getElementsByTagName("td")[3].innerText + '" form="input_update_track"></td>\n' +
+            '\t\t\t<td><input id="upd_track_length" required onkeyup="this.value = this.value.replace (/\\D/gi, \'\').replace (/^0+/, \'\')" value=" ' + row.getElementsByTagName("td")[4].innerText + '" form="input_update_track"></td>\n' +
+            '\t\t\t<td>\n' +
+            '\t\t\t\t<input type="submit" title="Apply" form="input_update_track">\n' +
+            '\t\t\t\t<button onClick="viewForInputTrackId()">Cancel</button>\n' +
+            '\t\t\t</td>\n' +
+            '\t\t</tr>\n' +
+            '\t</table>\n';
+    }
+    function viewForInputTrackId(){
+        document.getElementById("upd").innerHTML =
+            '\n\t<form id="start_update" onsubmit="goToUpdateTrack()">\n' +
+            '\t\t<input required onKeyUp="this.value = this.value.replace (/\\D/gi, \'\').replace (/^0+/, \'\')" id="upd_track_id" placeholder="Track id" style="margin-right: 20px">\n' +
+            '\t\t<button type="submit" form="start_update">Go to update</button>\n' +
+            '\t</form>\n'
+    }
+
+    function updateTrack(trackId) {
+        fetch(url + trackId, {
+            method: 'Put',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                name: document.getElementById("upd_track_name").value,
+                author: document.getElementById("upd_track_author").value,
+                genre: document.getElementById("upd_track_genre").value,
+                length: document.getElementById("upd_track_length").value
+            })
+        })
+            .then(response => {
+                if (response.ok) {
+                    getTracks();
+                } else alert("error");
+            });
+        viewForInputTrackId();
+    }
+
+    function deleteTrack(trackId) {
+        fetch(url + trackId, {
+            method: 'Delete'
+        })
+            .then(response => {
+                if (response.ok) {
+                    getTracks();
+                } else alert("error");
+            });
+
+    }
+
+    function createTrack() {
+        fetch(url, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                name: document.getElementById("track_name").value,
+                author: document.getElementById("track_author").value,
+                genre: document.getElementById("track_genre").value,
+                length: document.getElementById("track_length").value
+            })
+        })
+            .then(response => {
+                if (response.ok) {
+                    getTracks();
+                } else alert("error");
+            });
+    }
+
+    function viewTracks(tracks) {
+        let html =
+            '\n\t<tr>\n' +
+            '\t\t<th>Track id</th>\n' +
+            '\t\t<th>Track name</th>\n' +
+            '\t\t<th>Track author</th>\n' +
+            '\t\t<th>Track genre</th>\n' +
+            '\t\t<th>Track length</th>\n' +
+            '\t\t<th>Action</th>\n' +
+            '\t</tr>\n';
+        for (let i = 0; i < tracks.length; i++) {
+            let track = tracks[i];
+            html = html +
+                '\t<tr>\n' +
+                '\t\t<td>' + track.id + '</td>\n' +
+                '\t\t<td>' + track.name + '</td>\n' +
+                '\t\t<td>' + track.author + '</td>\n' +
+                '\t\t<td>' + track.genre + '</td>\n' +
+                '\t\t<td>' + track.length + '</td>\n' +
+                '\t\t<td><button onclick="deleteTrack(' + track.id + ')">Delete</button></td>\n' +
+                '\t</tr>\n';
+        }
+        html = html +
+            '\t<tr>\n' +
+            '\t\t<td> </td>\n' +
+            '\t\t<td><input required id="track_name" placeholder="Name" form="input_create_track"></td>\n' +
+            '\t\t<td><input required id="track_author" placeholder="Author" form="input_create_track"></td>\n' +
+            '\t\t<td><input required id="track_genre" placeholder="Genre" form="input_create_track"></td>\n' +
+            '\t\t<td><input required id="track_length" onkeyup="this.value = this.value.replace (/\\D/gi, \'\').replace (/^0+/, \'\')" placeholder="Length" form="input_create_track"></td>\n' +
+            '\t\t<td><button type="submit" form="input_create_track">Create</button></td>\n' +
+            '\t</tr>';
+        document.getElementById("track_list").innerHTML = html;
+    }
+
+    function getTracks() {
+        fetch(url)
+            .then(response => {
+                if (response.ok) {
+                    response.json().then(function (data) {
+                        viewTracks(data);
+                    })
+                } else alert("error");
+            });
+    }
+    getTracks();
+    viewForInputTrackId();
+</script>
+</body>
+</html>
