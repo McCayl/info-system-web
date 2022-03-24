@@ -11,7 +11,7 @@ public class AlbumViewController {
         return "Albums.html"; //add path to your html page
     }
 
-    @RequestMapping("albums/tracks")
+    @RequestMapping("albums-tracks")
     public String getAlbumTracksPage() {
         return "AlbumTracks.html"; //add path to your html page
     }
