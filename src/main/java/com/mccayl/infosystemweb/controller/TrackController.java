@@ -1,8 +1,8 @@
 package com.mccayl.infosystemweb.controller;
 
 import com.mccayl.infosystemweb.model.Track;
-import com.mccayl.infosystemweb.service.impl.AlbumServiceImpl;
-import com.mccayl.infosystemweb.service.impl.TrackServiceImpl;
+import com.mccayl.infosystemweb.service.AlbumService;
+import com.mccayl.infosystemweb.service.TrackService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -13,10 +13,10 @@ import java.util.List;
 public class TrackController {
 
     @Autowired
-    private TrackServiceImpl trackService;
+    private TrackService trackService;
 
     @Autowired
-    private AlbumServiceImpl albumService;
+    private AlbumService albumService;
 
     @GetMapping
     public List<Track> getAll() {
