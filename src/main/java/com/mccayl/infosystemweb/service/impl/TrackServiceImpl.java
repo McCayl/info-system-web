@@ -33,10 +33,7 @@ public class TrackServiceImpl implements TrackService {
             track.setGenre(newTrack.getGenre());
             track.setLength(newTrack.getLength());
             return trackRepo.saveAndFlush(track);
-        }).orElseGet(() -> {
-           newTrack.setId(id);
-           return trackRepo.saveAndFlush(newTrack);
-        });
+        }).orElseThrow(() -> new TrackNotFoundException(id));
     }
 
     @Override

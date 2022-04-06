@@ -53,4 +53,12 @@ public class Album {
         this.id = id;
     }
 
+    public void addTrack(Track track) {
+        trackList.add(track);
+    }
+
+    public void deleteTrack(Track track) {
+        trackList.remove(track);
+    }
+
 }

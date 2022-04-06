@@ -32,10 +32,7 @@ public class AlbumServiceImpl implements AlbumService {
             album.setName(newAlbum.getName());
             album.setYear(newAlbum.getYear());
             return albumRepo.saveAndFlush(album);
-        }).orElseGet(() -> {
-            newAlbum.setId(id);
-            return albumRepo.saveAndFlush(newAlbum);
-        });
+        }).orElseThrow(() -> new AlbumNotFoundException(id));
     }
 
     @Override
@@ -52,7 +49,7 @@ public class AlbumServiceImpl implements AlbumService {
     @Override
     public Track addTrackToAlbum(Long id, Track track) {
         return albumRepo.findById(id).map(album -> {
-            album.getTrackList().add(track);
+            album.addTrack(track);
             albumRepo.saveAndFlush(album);
             return track;
         }).orElseThrow(() -> new AlbumNotFoundException(id));
@@ -61,7 +58,7 @@ public class AlbumServiceImpl implements AlbumService {
     @Override
     public void deleteTrackFromAlbum(Long id, Track track) {
         albumRepo.findById(id).map(album -> {
-            album.getTrackList().remove(track);
+            album.deleteTrack(track);
             return albumRepo.saveAndFlush(album);
         }).orElseThrow(() -> new AlbumNotFoundException(id));
     }
