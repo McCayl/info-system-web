@@ -4,14 +4,18 @@ import javax.persistence.*;
 import java.util.List;
 
 @Entity
-@Table(name = "t_album")
+@Table(name = "album")
 public class Album {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String name;
     private Integer year;
-    @ManyToMany(targetEntity = Track.class, cascade = { CascadeType.PERSIST, CascadeType.MERGE })
+    @ManyToMany
+    @JoinTable(
+            name = "track_album",
+            joinColumns = @JoinColumn(name = "album_id"),
+            inverseJoinColumns = @JoinColumn(name = "track_id"))
     private List <Track> trackList;
 
     public Album() {}

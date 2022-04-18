@@ -1,7 +1,6 @@
 package com.mccayl.infosystemweb.controller;
 
 import com.mccayl.infosystemweb.model.Track;
-import com.mccayl.infosystemweb.service.AlbumService;
 import com.mccayl.infosystemweb.service.TrackService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -14,9 +13,6 @@ public class TrackController {
 
     @Autowired
     private TrackService trackService;
-
-    @Autowired
-    private AlbumService albumService;
 
     @GetMapping
     public List<Track> getAll() {
@@ -35,7 +31,6 @@ public class TrackController {
 
     @DeleteMapping("{id}")
     public void delTrack(@PathVariable Long id) {
-        albumService.deleteTrackFromAllAlbums(trackService.getById(id));
         trackService.deleteTrackById(id);
     }
 

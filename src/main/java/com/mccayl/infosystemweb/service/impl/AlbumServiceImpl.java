@@ -64,11 +64,6 @@ public class AlbumServiceImpl implements AlbumService {
     }
 
     @Override
-    public void deleteTrackFromAllAlbums(Track track) {
-        albumRepo.findAll().forEach(el -> el.getTrackList().remove(track));
-    }
-
-    @Override
     public List<Track> getAlbumTracks(Long id) {
         return albumRepo.findById(id)
                 .orElseThrow(() -> new AlbumNotFoundException(id))

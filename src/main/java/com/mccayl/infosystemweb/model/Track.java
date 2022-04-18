@@ -1,9 +1,12 @@
 package com.mccayl.infosystemweb.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import javax.persistence.*;
+import java.util.List;
 
 @Entity
-@Table(name = "t_track")
+@Table(name = "track")
 public class Track {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -12,6 +15,13 @@ public class Track {
     private String author;
     private String genre;
     private Integer length;
+    @ManyToMany(cascade = { CascadeType.PERSIST, CascadeType.MERGE })
+    @JoinTable(
+            name = "track_album",
+            joinColumns = @JoinColumn(name = "track_id"),
+            inverseJoinColumns = @JoinColumn(name = "album_id"))
+    @JsonIgnore
+    private List <Album> albums;
 
     public Track() {}
 
@@ -60,6 +70,14 @@ public class Track {
 
     public void setLength(Integer length) {
         this.length = length;
+    }
+
+    public List<Album> getAlbums() {
+        return albums;
+    }
+
+    public void setAlbums(List<Album> albums) {
+        this.albums = albums;
     }
 
 }
