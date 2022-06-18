@@ -4,7 +4,6 @@ import com.mccayl.infosystemweb.model.Album;
 import com.mccayl.infosystemweb.model.Track;
 import com.mccayl.infosystemweb.service.AlbumService;
 import com.mccayl.infosystemweb.service.TrackService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -13,11 +12,13 @@ import java.util.List;
 @RequestMapping("api/v1/albums")
 public class AlbumController {
 
-    @Autowired
     private AlbumService albumService;
-
-    @Autowired
     private TrackService trackService;
+
+    public AlbumController(AlbumService albumService, TrackService trackService) {
+        this.albumService = albumService;
+        this.trackService = trackService;
+    }
 
     @GetMapping
     public List<Album> getAll() {

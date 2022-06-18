@@ -2,7 +2,6 @@ package com.mccayl.infosystemweb.controller;
 
 import com.mccayl.infosystemweb.model.Track;
 import com.mccayl.infosystemweb.service.TrackService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -11,8 +10,11 @@ import java.util.List;
 @RequestMapping("api/v1/tracks")
 public class TrackController {
 
-    @Autowired
     private TrackService trackService;
+
+    public TrackController(TrackService trackService) {
+        this.trackService = trackService;
+    }
 
     @GetMapping
     public List<Track> getAll() {

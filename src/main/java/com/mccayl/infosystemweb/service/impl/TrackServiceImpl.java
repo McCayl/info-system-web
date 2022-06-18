@@ -4,7 +4,6 @@ import com.mccayl.infosystemweb.exception.TrackNotFoundException;
 import com.mccayl.infosystemweb.model.Track;
 import com.mccayl.infosystemweb.repository.TrackRepository;
 import com.mccayl.infosystemweb.service.TrackService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -12,8 +11,11 @@ import java.util.List;
 @Service
 public class TrackServiceImpl implements TrackService {
 
-    @Autowired
     private TrackRepository trackRepo;
+
+    public TrackServiceImpl(TrackRepository trackRepo) {
+        this.trackRepo = trackRepo;
+    }
 
     @Override
     public Track addTrack(Track track) {

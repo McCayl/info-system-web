@@ -5,7 +5,6 @@ import com.mccayl.infosystemweb.model.Album;
 import com.mccayl.infosystemweb.model.Track;
 import com.mccayl.infosystemweb.repository.AlbumRepository;
 import com.mccayl.infosystemweb.service.AlbumService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -13,8 +12,11 @@ import java.util.List;
 @Service
 public class AlbumServiceImpl implements AlbumService {
 
-    @Autowired
     private AlbumRepository albumRepo;
+
+    public AlbumServiceImpl(AlbumRepository albumRepo) {
+        this.albumRepo = albumRepo;
+    }
 
     @Override
     public Album addAlbum(Album album) {
