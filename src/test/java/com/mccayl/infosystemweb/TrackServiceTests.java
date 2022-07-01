@@ -1,5 +1,6 @@
 package com.mccayl.infosystemweb;
 
+import com.mccayl.infosystemweb.exception.TrackNotFoundException;
 import com.mccayl.infosystemweb.model.Track;
 import com.mccayl.infosystemweb.repository.TrackRepository;
 import com.mccayl.infosystemweb.service.impl.TrackServiceImpl;
@@ -11,10 +12,11 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.util.Optional;
-
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.BDDMockito.given;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.AdditionalAnswers.returnsFirstArg;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 public class TrackServiceTests {
@@ -37,19 +39,19 @@ public class TrackServiceTests {
         track.setLength(1);
     }
 
-    @DisplayName("test for addTrack method")
+    @DisplayName("test for getById method")
     @Test
-    public void givenTrackObject_whenAddTrack_thenReturnTrackObject() {
-        given(trackRepository.findById(track.getId()))
-                .willReturn(Optional.empty());
-        System.out.println(trackRepository.findById(track.getId()));
-
-        given(trackRepository.saveAndFlush(track))
-                .willReturn(track);
-
-        Track savedTrack = trackService.addTrack(track);
-
-        assertThat(savedTrack).isNotNull();
+    public void getByIdGetNonExistentTrackException() {
+        assertThrows(TrackNotFoundException.class,
+                () -> trackService.getById(track.getId()));
     }
 
+    @DisplayName("test for addTrack method")
+    @Test
+    public void addTrackWillReturnTrackTrackObject() {
+        when(trackRepository.saveAndFlush(any(Track.class))).then(returnsFirstArg());
+        Track savedTrack = trackService.addTrack(track);
+
+        assertThat(savedTrack).isEqualTo(track);
+    }
 }
